@@ -1,0 +1,39 @@
+# --- Environnement / secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+
+# --- Node / NestJS / Next.js (backend + admin-dashboard) ---
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Prisma ---
+prisma/*.db
+
+# --- Flutter / Dart (mobile-livreur) ---
+mobile-livreur/.dart_tool/
+mobile-livreur/.flutter-plugins
+mobile-livreur/.flutter-plugins-dependencies
+mobile-livreur/.packages
+mobile-livreur/build/
+mobile-livreur/**/android/.gradle
+mobile-livreur/**/ios/Pods/
+mobile-livreur/**/ios/.symlinks/
+
+# --- Éditeurs / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Logs divers ---
+*.log
