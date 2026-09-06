@@ -1,0 +1,170 @@
+// Schéma de données : UNIQUE Livraison Expresse
+// Basé sur le MCD simplifié du cahier des charges (docs/cahier-des-charges.md, §8)
+// Documentation : https://www.prisma.io/docs
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DISPATCHER
+  LIVREUR
+}
+
+enum StatutLivreur {
+  DISPONIBLE
+  EN_LIVRAISON
+  CHEZ_FOURNISSEUR
+  HORS_LIGNE
+  DESACTIVE
+}
+
+enum StatutCommande {
+  NOUVELLE
+  CONFIRMEE
+  LIVREUR_AFFECTE
+  EN_ROUTE_FOURNISSEUR
+  MARCHANDISE_RECUPEREE
+  EN_ROUTE_CLIENT
+  LIVREE
+  TERMINEE
+  ANNULEE
+  ECHEC_LIVRAISON
+}
+
+enum StatutPaiement {
+  NON_PAYE
+  PAYE
+}
+
+model Utilisateur {
+  id           String   @id @default(cuid())
+  nom          String
+  telephone    String   @unique
+  motDePasse   String
+  role         Role
+  creeLe       DateTime @default(now())
+
+  livreur                Livreur?
+  historiquesCommandes   HistoriqueStatutCommande[]
+
+  @@map("utilisateurs")
+}
+
+model Livreur {
+  id               String         @id @default(cuid())
+  utilisateur      Utilisateur    @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  utilisateurId    String         @unique
+  vehicule         String?
+  immatriculation  String?
+  statut           StatutLivreur  @default(HORS_LIGNE)
+
+  commandes        Commande[]
+  positions        PositionLivreur[]
+
+  @@map("livreurs")
+}
+
+model Client {
+  id         String    @id @default(cuid())
+  nom        String
+  telephone  String
+  creeLe     DateTime  @default(now())
+
+  adresses   Adresse[]
+  commandes  Commande[]
+
+  @@map("clients")
+}
+
+model Adresse {
+  id        String   @id @default(cuid())
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId  String
+  libelle   String?
+  gpsLat    Float?
+  gpsLng    Float?
+
+  commandes Commande[]
+
+  @@map("adresses")
+}
+
+model Fournisseur {
+  id         String    @id @default(cuid())
+  nom        String
+  telephone  String
+  adresse    String?
+  gpsLat     Float?
+  gpsLng     Float?
+
+  produits   ProduitFournisseur[]
+  commandes  Commande[]
+
+  @@map("fournisseurs")
+}
+
+model ProduitFournisseur {
+  id             String      @id @default(cuid())
+  fournisseur    Fournisseur @relation(fields: [fournisseurId], references: [id], onDelete: Cascade)
+  fournisseurId  String
+  libelle        String
+
+  @@map("produits_fournisseurs")
+}
+
+model Commande {
+  id                    String          @id @default(cuid())
+  client                Client          @relation(fields: [clientId], references: [id])
+  clientId              String
+  fournisseur           Fournisseur     @relation(fields: [fournisseurId], references: [id])
+  fournisseurId         String
+  livreur               Livreur?        @relation(fields: [livreurId], references: [id])
+  livreurId             String?
+  adresseLivraison      Adresse         @relation(fields: [adresseLivraisonId], references: [id])
+  adresseLivraisonId    String
+
+  descriptionMarchandise String
+  montantMarchandise     Float?
+  fraisLivraison         Float
+
+  statut                 StatutCommande  @default(NOUVELLE)
+  statutPaiement         StatutPaiement  @default(NON_PAYE)
+
+  creeLe                 DateTime        @default(now())
+  misAJourLe             DateTime        @updatedAt
+
+  historique             HistoriqueStatutCommande[]
+
+  @@map("commandes")
+}
+
+model HistoriqueStatutCommande {
+  id             String         @id @default(cuid())
+  commande       Commande       @relation(fields: [commandeId], references: [id], onDelete: Cascade)
+  commandeId     String
+  statut         StatutCommande
+  horodatage     DateTime       @default(now())
+  utilisateur    Utilisateur?   @relation(fields: [utilisateurId], references: [id])
+  utilisateurId  String?
+
+  @@map("historique_statuts_commande")
+}
+
+model PositionLivreur {
+  id          String   @id @default(cuid())
+  livreur     Livreur  @relation(fields: [livreurId], references: [id], onDelete: Cascade)
+  livreurId   String
+  gpsLat      Float
+  gpsLng      Float
+  horodatage  DateTime @default(now())
+
+  @@index([livreurId, horodatage])
+  @@map("positions_livreurs")
+}

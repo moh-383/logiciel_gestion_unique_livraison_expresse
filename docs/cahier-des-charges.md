@@ -1,7 +1,7 @@
 # Cahier des charges : Logiciel de gestion des livraisons
 ## UNIQUE Livraison Expresse
 
-Version 0.1 : Document de travail, à valider.
+Version 0.1 : Document de travail, à faire valider par le client avant développement.
 Équipe projet : Personne A & Personne B.
 
 ---
@@ -51,7 +51,7 @@ Cycle de vie d'une commande, dans sa forme la plus simple :
 | **Administrateur** | Oui | Accès complet : utilisateurs, fournisseurs, livreurs, commandes, statistiques. |
 | **Dispatcher / Opérateur** | Oui | Crée les commandes, affecte les livreurs, suit les livraisons. (Peut être la même personne que l'Administrateur au démarrage.) |
 | **Livreur** | Oui | Utilise l'application mobile : reçoit ses commandes, met à jour son statut et sa position, confirme la livraison. |
-| **Client** | Non (V2/V3) | Pas d'accès direct au MVP — il continue d'appeler/contacter par Facebook. Un compte client et un historique existent en base, mais sans interface dédiée. |
+| **Client** | Non (V2/V3) | Pas d'accès direct au MVP, il continue d'appeler/contacter par Facebook. Un compte client et un historique existent en base, mais sans interface dédiée. |
 | **Fournisseur** | Non (V2/V3) | Simple fiche de référence dans le MVP (nom, contact, adresse, produits). Pas d'interface propre. |
 | **Comptable / Superviseur** | Non (V3) | Rôles supplémentaires envisageables une fois le cœur du système stabilisé. |
 
@@ -73,7 +73,7 @@ Cycle de vie d'une commande, dans sa forme la plus simple :
 
 ### 5.2 Version 2
 
-- Gestion des paiements (montant marchandise / frais de livraison / qui encaisse quoi : cf. §7.7).
+- Gestion des paiements (montant marchandise / frais de livraison / qui encaisse quoi , cf. §7.7).
 - Preuve de livraison (photo ou code de confirmation).
 - Historique et statistiques (livraisons/jour, chiffre d'affaires, performance livreur).
 - Gestion multi-adresses client, gestion de zones de livraison.
@@ -98,7 +98,7 @@ Cycle de vie d'une commande, dans sa forme la plus simple :
 - Historique des commandes du client, consultable par l'admin.
 
 ### 6.3 Gestion des fournisseurs
-- Fiche fournisseur : nom, téléphone, adresse, position GPS, liste de produits en texte libre (pas de gestion de stock, le stock reste chez le fournisseur).
+- Fiche fournisseur : nom, téléphone, adresse, position GPS, liste de produits en texte libre (pas de gestion de stock — le stock reste chez le fournisseur).
 - Recherche rapide d'un fournisseur lors de la création d'une commande.
 
 ### 6.4 Gestion des livreurs
@@ -106,7 +106,7 @@ Cycle de vie d'une commande, dans sa forme la plus simple :
 - Statuts : `disponible`, `en_livraison`, `chez_fournisseur`, `hors_ligne`, `désactivé`.
 - Historique des livraisons effectuées par livreur.
 
-### 6.5 Gestion des commandes : workflow des statuts
+### 6.5 Gestion des commandes — workflow des statuts
 
 ```
 nouvelle → confirmée → livreur_affecté → en_route_fournisseur →
@@ -182,7 +182,7 @@ PositionLivreur (id, livreur_id, gps_lat, gps_lng, horodatage)
 
 Voir le fichier séparé [`questions-client.md`](./questions-client.md) pour la liste complète des questions organisées par thème (reprises et complétées de la discussion avec GPT). Les hypothèses ci-dessous sont celles retenues **par défaut** pour pouvoir démarrer le développement du MVP sans attendre les réponses :
 
-1. Le modèle de paiement retenu est le **Modèle C** (client paie la structure, qui reverse au fournisseur) : §6.7.
+1. Le modèle de paiement retenu est le **Modèle C** (client paie la structure, qui reverse au fournisseur), §6.7.
 2. Les livreurs sont supposés indépendants (pas de gestion de paie salariale au MVP).
 3. Un client n'a pas de compte/app dédiée au MVP, il continue d'appeler.
 4. Un fournisseur ne gère pas de catalogue produit structuré au MVP, texte libre uniquement.
@@ -223,7 +223,7 @@ Voir le fichier séparé [`questions-client.md`](./questions-client.md) pour la 
 | Backend | **Node.js + TypeScript (NestJS)** | Un seul langage (TypeScript) pour backend + dashboard admin → moins de contexte à switcher pour 2 développeurs. NestJS impose une structure claire (modules/services/contrôleurs), utile pour garder le code propre à deux. |
 | Base de données | **PostgreSQL** | Relationnel, robuste, gratuit, gère bien les statuts/historiques/relations décrites au §8. Extension **PostGIS** activable plus tard si les requêtes géographiques deviennent complexes (V2/V3) ; au MVP, coordonnées lat/lng en colonnes simples suffisent. |
 | ORM | **Prisma** | Migrations simples, typage TypeScript de bout en bout, bonne courbe d'apprentissage à deux. |
-| Temps réel (position GPS, statuts) | **WebSocket via Socket.IO**, avec repli sur polling REST toutes les 30-60s si la connexion est instable | Évite de sur-promettre un "vrai temps réel" non tenable sur des réseaux faibles. |
+| Temps réel (position GPS, statuts) | **WebSocket via Socket.IO**, avec repli sur polling REST toutes les 30–60s si la connexion est instable | Évite de sur-promettre un "vrai temps réel" non tenable sur des réseaux faibles (cf. remarque de GPT au §4 de sa réponse). |
 | Dashboard admin | **Next.js (React) + TailwindCSS** | Écosystème riche, bon support cartographique, déploiement simple (Vercel). |
 | Cartographie | **Leaflet + OpenStreetMap** | Gratuit, pas de clé API payante à gérer dès le MVP ; migration possible vers Mapbox/Google Maps en V2 si besoin de fonds de carte plus riches. |
 | Application livreur | **Flutter** | Un seul codebase pour Android (prioritaire) et iOS (secondaire), bon support GPS/notifications/mode offline, adapté aux téléphones d'entrée de gamme. |
@@ -232,6 +232,8 @@ Voir le fichier séparé [`questions-client.md`](./questions-client.md) pour la 
 | Hébergement (MVP) | Backend + PostgreSQL sur **Railway** ou **Render** ; dashboard sur **Vercel** ; app livreur distribuée en APK direct ou via Play Store en bêta fermée | Budget réduit, mise en place rapide, adapté à un projet étudiant/débutant en production. |
 | Gestion de version | **Git + GitHub**, convention de commits (`feat:`, `fix:`, `docs:`...), une branche `main` protégée + branches de fonctionnalités | Nécessaire même à deux, pour éviter les conflits et garder un historique lisible. |
 
+### 10.3 Alternative envisageable
+Si l'un de vous deux est nettement plus à l'aise en Python : **Django + Django REST Framework** est une alternative backend crédible (ORM intégré, panneau d'administration auto-généré utile pour un MVP rapide). Dans ce cas, prévoir Django Channels pour la partie temps réel. Ce document part sur Node.js/NestJS par défaut, mais ce choix doit être confirmé en équipe avant le premier commit de code.
 
 ## 11. Feuille de route indicative (sprints de 2 semaines)
 
