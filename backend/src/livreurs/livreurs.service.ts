@@ -1,7 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
+import { UtilisateurCourant } from '../common/decorators/current-user.decorator';
 import { CreateLivreurDto, UpdateLivreurDto, UpdateStatutLivreurDto } from './dto/livreur.dto';
 
 @Injectable()
@@ -60,8 +61,11 @@ export class LivreursService {
     return this.prisma.livreur.update({ where: { id }, data: dto });
   }
 
-  async updateStatut(id: string, dto: UpdateStatutLivreurDto) {
+  async updateStatut(id: string, dto: UpdateStatutLivreurDto, user: UtilisateurCourant) {
     await this.findOne(id);
+    if (user.role === Role.LIVREUR && user.livreurId !== id) {
+      throw new ForbiddenException('Vous ne pouvez modifier que votre propre statut');
+    }
     return this.prisma.livreur.update({ where: { id }, data: { statut: dto.statut } });
   }
 

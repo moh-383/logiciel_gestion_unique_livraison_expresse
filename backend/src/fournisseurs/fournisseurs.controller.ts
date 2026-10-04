@@ -19,9 +19,12 @@ import {
   CreateProduitDto,
   UpdateFournisseurDto,
 } from './dto/fournisseur.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 @Roles(Role.ADMIN, Role.DISPATCHER)
+@ApiTags('Fournisseurs')
 @Controller('fournisseurs')
 export class FournisseursController {
   constructor(private fournisseursService: FournisseursService) {}

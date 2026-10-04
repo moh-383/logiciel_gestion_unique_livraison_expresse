@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { StatutLivreur } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EnregistrerPositionDto } from './dto/position.dto';
 
@@ -6,10 +7,15 @@ import { EnregistrerPositionDto } from './dto/position.dto';
 export class GpsService {
   constructor(private prisma: PrismaService) {}
 
-  async enregistrerPosition(dto: EnregistrerPositionDto) {
+  async enregistrerPosition(livreurId: string, dto: EnregistrerPositionDto) {
+    const livreur = await this.prisma.livreur.findUnique({ where: { id: livreurId }, select: { statut: true } });
+    if (!livreur) throw new NotFoundException('Livreur introuvable');
+    if (livreur.statut === StatutLivreur.HORS_LIGNE || livreur.statut === StatutLivreur.DESACTIVE) {
+      throw new ForbiddenException('La position GPS est désactivée lorsque le livreur est hors service');
+    }
     return this.prisma.positionLivreur.create({
       data: {
-        livreurId: dto.livreurId,
+        livreurId,
         gpsLat: dto.gpsLat,
         gpsLng: dto.gpsLng,
       },
