@@ -37,3 +37,11 @@ Thumbs.db
 
 # --- Logs divers ---
 *.log
+*.tsbuildinfo
+.Rhistory
+
+# --- Environment ---
+backend/.env
+
+# --- Firebase credentials ---
+backend/secrets/

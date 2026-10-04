@@ -15,9 +15,12 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ClientsService } from './clients.service';
 import { CreateAdresseDto, CreateClientDto, UpdateClientDto } from './dto/client.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 @Roles(Role.ADMIN, Role.DISPATCHER)
+@ApiTags('Clients')
 @Controller('clients')
 export class ClientsController {
   constructor(private clientsService: ClientsService) {}

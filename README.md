@@ -1,52 +1,29 @@
-# UNIQUE Livraison Expresse : Logiciel de gestion des livraisons
+# UNIQUE Livraison Expresse
 
-Plateforme de gestion et de pilotage des livraisons permettant de centraliser les commandes, les clients, les fournisseurs et les livreurs, avec affectation, suivi GPS et notifications, en remplacement de la coordination manuelle par téléphone et groupes WhatsApp.
+Plateforme MVP de dispatch avec API NestJS/Prisma/PostgreSQL, dashboard Next.js/Leaflet et application Android Flutter livreur. Le dashboard gère clients, fournisseurs, livreurs et commandes; le mobile consulte et fait progresser les commandes affectées, avec envoi GPS en premier plan.
 
-## 📄 Documentation
+## Démarrage
 
-Toute la spécification du projet se trouve dans `docs/` :
+Suivre [`docs/setup.md`](docs/setup.md) pour PostgreSQL, API, seed local, dashboard et Flutter. Les secrets d’accès sont fournis par l’environnement local et ne sont pas versionnés.
 
-- [`docs/cahier-des-charges.md`](docs/cahier-des-charges.md) : spécification fonctionnelle et technique complète.
-- [`docs/questions-client.md`](docs/questions-client.md) : questions à valider avec le client, par thème.
-- [`docs/repartition-taches.md`](docs/repartition-taches.md) : répartition du travail entre les deux développeurs et checklist de démarrage.
+## Structure
 
-**À lire en premier avant d'écrire la moindre ligne de code.**
-
-## 🏗️ Structure du repo
-
-```
-UNIQUE-Livraison-Expresse/
-├── docs/                  # Cahier des charges, questions, répartition des tâches
-├── backend/               # API : Node.js / NestJS + PostgreSQL (Prisma)
-├── admin-dashboard/       # Tableau de bord web : Next.js + Tailwind + Leaflet
-├── mobile-livreur/        # Application mobile livreur : Flutter
-└── .github/workflows/     # Intégration continue (à compléter)
+```text
+backend/          API NestJS, Prisma, REST et Socket.IO
+admin-dashboard/  Console Next.js et carte Leaflet/OpenStreetMap
+mobile-livreur/   Client Flutter Android
+docs/             Contrat API, installation, marque et état vérifié
 ```
 
-## 🧱 Stack technique (résumé : détails et justification dans le cahier des charges §10)
+## Documentation
 
-| Brique | Techno |
-|---|---|
-| Backend | Node.js, TypeScript, NestJS |
-| Base de données | PostgreSQL + Prisma ORM |
-| Temps réel | Socket.IO (WebSocket) |
-| Dashboard admin | Next.js, React, TailwindCSS, Leaflet/OpenStreetMap |
-| App mobile livreur | Flutter |
-| Notifications | Firebase Cloud Messaging |
-| Authentification | JWT (access + refresh token) |
+- [État du projet et vérifications](docs/project-status.md)
+- [Installation et parcours de démonstration](docs/setup.md)
+- [Contrat API](docs/api.md)
+- [Identité visuelle](docs/brand-guidelines.md)
+- [Design system](docs/design-system.md)
+- [Décisions techniques](docs/decisions.md)
+- [Limites connues](docs/known-issues.md)
+- [Journal de développement](docs/development-log.md)
 
-## 🚀 Démarrage rapide
-
-Chaque module a son propre README avec les instructions d'installation :
-
-- [`backend/README.md`](backend/README.md)
-- [`admin-dashboard/README.md`](admin-dashboard/README.md)
-- [`mobile-livreur/README.md`](mobile-livreur/README.md)
-
-## 👥 Équipe
-
-Projet développé à deux : Personne A (backend) et Personne B (interfaces). Voir [`docs/repartition-taches.md`](docs/repartition-taches.md) pour le détail.
-
-## 📌 État du projet
-
-En phase de cadrage , le MVP est défini dans le cahier des charges (§5.1). Développement pas encore démarré.
+Les notifications FCM et la synchronisation des actions hors connexion sont implémentées. L’envoi push nécessite un compte de service Firebase côté API; le parcours complet doit encore être validé sur un appareil Android. Voir les limites dans `docs/known-issues.md`.

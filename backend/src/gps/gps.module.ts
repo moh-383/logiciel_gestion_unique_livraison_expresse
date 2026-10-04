@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { AuthModule } from '../auth/auth.module';
 import { GpsService } from './gps.service';
 import { GpsGateway } from './gps.gateway';
 import { GpsController } from './gps.controller';
 
 @Module({
-  imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-    }),
-  ],
+  imports: [AuthModule, PassportModule.register({})],
   controllers: [GpsController],
   providers: [GpsService, GpsGateway],
   exports: [GpsService],

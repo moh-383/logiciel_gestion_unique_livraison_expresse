@@ -12,6 +12,14 @@ import { Server, Socket } from 'socket.io';
 import { GpsService } from './gps.service';
 import { EnregistrerPositionDto } from './dto/position.dto';
 
+function verifierOrigineSocket(origin: string | undefined, callback: (error: Error | null, autorise?: boolean) => void) {
+  const origines = process.env.CORS_ORIGINS
+    ?.split(',')
+    .map((value) => value.trim())
+    .filter(Boolean) ?? ['http://localhost:3001', 'http://127.0.0.1:3001'];
+  callback(null, !origin || origines.includes(origin));
+}
+
 /**
  * Canal temps réel pour la position des livreurs.
  *
@@ -24,7 +32,7 @@ import { EnregistrerPositionDto } from './dto/position.dto';
  * En cas de connexion instable côté livreur, l'app mobile doit privilégier le
  * fallback REST (POST /gps/position) qui fonctionne aussi hors WebSocket.
  */
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: verifierOrigineSocket } })
 export class GpsGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
@@ -41,7 +49,7 @@ export class GpsGateway implements OnGatewayConnection {
       const token = client.handshake.auth?.token as string | undefined;
       if (!token) throw new Error('Token manquant');
 
-      const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      const payload = this.jwtService.verify(token);
       (client.data as any).utilisateur = payload;
 
       if (payload.role === 'ADMIN' || payload.role === 'DISPATCHER') {
@@ -58,7 +66,15 @@ export class GpsGateway implements OnGatewayConnection {
     @MessageBody() dto: EnregistrerPositionDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const position = await this.gpsService.enregistrerPosition(dto);
+    const user = client.data.utilisateur;
+    if (user?.role !== 'LIVREUR' || !user.livreurId) {
+      client.disconnect();
+      return { ok: false };
+    }
+    if (dto.gpsLat < -90 || dto.gpsLat > 90 || dto.gpsLng < -180 || dto.gpsLng > 180) {
+      return { ok: false };
+    }
+    const position = await this.gpsService.enregistrerPosition(user.livreurId, dto);
     this.server.to('dashboard').emit('position:livreur', position);
     return { ok: true };
   }

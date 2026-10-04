@@ -10,6 +10,7 @@ import { LivreursModule } from './livreurs/livreurs.module';
 import { CommandesModule } from './commandes/commandes.module';
 import { GpsModule } from './gps/gps.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     GpsModule,
     NotificationsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}

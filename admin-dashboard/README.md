@@ -1,32 +1,23 @@
-# Admin Dashboard : UNIQUE Livraison Expresse
+# Console UNIQUE Livraison Expresse
 
-Interface web d'administration : gestion des clients, fournisseurs, livreurs, commandes, carte de suivi GPS, statistiques.
+Dashboard Next.js/TypeScript avec identité visuelle UNIQUE, connexion admin/dispatcher, compteurs API, carte Leaflet/OpenStreetMap, clients, fournisseurs, livreurs, commandes et flux Socket.IO avec polling GPS de secours.
 
-## Stack prévue
-- Next.js (React) + TypeScript
-- TailwindCSS
-- Leaflet + OpenStreetMap (carte des livreurs)
-- Socket.IO client (mise à jour temps réel des positions/statuts)
+## Développement
 
-## Mise en place (à faire au Sprint 0)
-
-```bash
-# Depuis ce dossier
-npx create-next-app@latest . --typescript --tailwind
-npm install leaflet react-leaflet socket.io-client axios
+```sh
+npm ci
+npm run dev
 ```
 
-Créer un fichier `.env.local` (non versionné) avec au minimum :
+API par défaut : `http://localhost:3000/api`. Pour la remplacer, créer `.env.local` avec `NEXT_PUBLIC_API_URL=http://localhost:3000/api`. Ajouter l’origine web (généralement `http://localhost:3001`) à `CORS_ORIGINS` de l’API.
 
-```
-NEXT_PUBLIC_API_URL="http://localhost:3000"
-```
+## Fonctionnalités
 
-## Écrans prévus (MVP : voir `docs/cahier-des-charges.md` §6)
-- Connexion
-- Liste / fiche Clients
-- Liste / fiche Fournisseurs
-- Liste / fiche Livreurs (avec statut)
-- Liste des commandes + création + suivi de statut
-- Carte des livreurs en service
-- Tableau de bord (compteurs simples : commandes du jour, livrées, en cours)
+- Clients : créer, consulter, éditer, supprimer; adresses/coordonnées à la création; recherche locale.
+- Fournisseurs : création, fiche, édition, suppression, recherche.
+- Livreurs : consulter/statut/disponibilité; création et modification véhicule réservées à l’admin conformément aux rôles API.
+- Commandes : liste filtrée par statut, création depuis les référentiels, détail/historique, confirmation, affectation d’un livreur disponible, transitions API et motif d’échec.
+- Compteurs : commandes du jour, en cours, livrées et livreurs actifs.
+- Carte : points GPS temps réel Socket.IO, repli REST 30 s, âge explicite de chaque dernière position.
+
+Les transitions sont toujours validées par NestJS. Voir [`../docs/api.md`](../docs/api.md) et [`../docs/setup.md`](../docs/setup.md). Le build de production se vérifie avec `npm run build`.

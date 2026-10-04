@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "316947775255",
+    "project_id": "unique-livraison-expresse",
+    "storage_bucket": "unique-livraison-expresse.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316947775255:android:9b93fee99f66a976ab0152",
+        "android_client_info": {
+          "package_name": "bf.unique.unique_livraison"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV--9kvPs9m5irSSHT0DHmUaV0rSL06N0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

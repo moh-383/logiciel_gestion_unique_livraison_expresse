@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateFournisseurDto {
   @IsString()
@@ -14,9 +14,15 @@ export class CreateFournisseurDto {
   adresse?: string;
 
   @IsOptional()
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
   gpsLat?: number;
 
   @IsOptional()
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
   gpsLng?: number;
 }
 
@@ -34,9 +40,15 @@ export class UpdateFournisseurDto {
   adresse?: string;
 
   @IsOptional()
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
   gpsLat?: number;
 
   @IsOptional()
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
   gpsLng?: number;
 }
 

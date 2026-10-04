@@ -15,8 +15,11 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, UtilisateurCourant } from '../common/decorators/current-user.decorator';
 import { CommandesService } from './commandes.service';
 import { AffecterLivreurDto, ChangerStatutDto, CreateCommandeDto } from './dto/commande.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
+@ApiTags('Commandes')
 @Controller('commandes')
 export class CommandesController {
   constructor(private commandesService: CommandesService) {}
@@ -45,8 +48,8 @@ export class CommandesController {
 
   @Roles(Role.ADMIN, Role.DISPATCHER, Role.LIVREUR)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commandesService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() user: UtilisateurCourant) {
+    return this.commandesService.findOneForUser(id, user);
   }
 
   @Roles(Role.ADMIN, Role.DISPATCHER)
@@ -66,6 +69,6 @@ export class CommandesController {
     @Body() dto: ChangerStatutDto,
     @CurrentUser() user: UtilisateurCourant,
   ) {
-    return this.commandesService.changerStatut(id, dto, user.sub);
+    return this.commandesService.changerStatut(id, dto, user);
   }
 }

@@ -12,10 +12,14 @@ import { Role } from '@prisma/client';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser, UtilisateurCourant } from '../common/decorators/current-user.decorator';
 import { LivreursService } from './livreurs.service';
 import { CreateLivreurDto, UpdateLivreurDto, UpdateStatutLivreurDto } from './dto/livreur.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
+@ApiTags('Livreurs')
 @Controller('livreurs')
 export class LivreursController {
   constructor(private livreursService: LivreursService) {}
@@ -48,8 +52,8 @@ export class LivreursController {
   // tout comme un admin/dispatcher depuis le dashboard.
   @Roles(Role.ADMIN, Role.DISPATCHER, Role.LIVREUR)
   @Patch(':id/statut')
-  updateStatut(@Param('id') id: string, @Body() dto: UpdateStatutLivreurDto) {
-    return this.livreursService.updateStatut(id, dto);
+  updateStatut(@Param('id') id: string, @Body() dto: UpdateStatutLivreurDto, @CurrentUser() user: UtilisateurCourant) {
+    return this.livreursService.updateStatut(id, dto, user);
   }
 
   @Roles(Role.ADMIN, Role.DISPATCHER)
